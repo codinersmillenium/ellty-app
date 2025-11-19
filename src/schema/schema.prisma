@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  post      Post[]
+  operation Operation[]
+}
+
+model Post {
+  id              Int           @id @default(autoincrement())
+  title           String?       
+  starting_numb   Int           
+  author_id       Int           
+  author          User          @relation(fields: [author_id], references: [id])
+  createdAt       DateTime      @default(now())
+  operation       Operation[]
+}
+
+model Operation {
+  id                 String        @id @default(uuid())
+  post_id            Int           
+  post               Post          @relation(fields: [post_id], references: [id])
+  parent_id          String?       
+  author_id          Int           
+  author             User          @relation(fields: [author_id], references: [id])
+  type               OperationType
+  right_operand      Int
+  result             Int
+  createdAt          DateTime      @default(now())
+}
+
+enum OperationType {
+  ADD
+  SUB
+  MUL
+  DIV
+}
